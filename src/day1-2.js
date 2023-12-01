@@ -8,51 +8,59 @@ export async function extractAndTrimLines(filename) {
 	const lines = bufferData
 		.toString()
 		.split('\n')
-		.map((line) => line.trim());
+		.filter((line) => line.trim());
 	return lines;
 }
 
 const findLastDigit =
-	/.*([0-9]|one|two|three|four|five|six|seven|eight|nine).*$/;
-const findFirstDigit = /([0-9]|one|two|three|four|five|six|seven|eight|nine)/g;
+	/.*([1-9]|one|two|three|four|five|six|seven|eight|nine).*$/;
+const findFirstDigit = /[1-9]|one|two|three|four|five|six|seven|eight|nine/;
 
 function parseDigit(digit) {
 	switch (digit) {
 		case 'one':
-			return 1;
+			return '1';
 		case 'two':
-			return 2;
+			return '2';
 		case 'three':
-			return 3;
+			return '3';
 		case 'four':
-			return 4;
+			return '4';
 		case 'five':
-			return 5;
+			return '5';
 		case 'six':
-			return 6;
+			return '6';
 		case 'seven':
-			return 7;
+			return '7';
 		case 'eight':
-			return 8;
+			return '8';
 		case 'nine':
-			return 9;
+			return '9';
 		default:
-			return parseInt(digit);
+			return digit;
 	}
 }
 
-export function addFirstAndLastLineDigits(line) {
-	const digits = [...line.matchAll(findFirstDigit)];
-	const firstDigit = digits[0]?.[0];
-	const lastDigit = digits[digits.length - 1]?.[0];
-	if (firstDigit && lastDigit) {
-		return parseInt(parseDigit(firstDigit) + '' + parseDigit(lastDigit));
-	}
-	return 0;
+export function debug(line) {
+	const firstDigit = findFirstDigit.exec(line)[0];
+	const lastDigit = findLastDigit.exec(line)[1];
+	return [firstDigit, lastDigit];
+}
+
+export function concatFirstAndLastDigits(line) {
+	const firstDigit = findFirstDigit.exec(line)?.[0] ?? '0';
+	const lastDigit = findLastDigit.exec(line)?.[1] ?? '0';
+	return parseDigit(firstDigit) + parseDigit(lastDigit);
+}
+
+export function sumUpLines(lines) {
+	const values = lines
+		.map(concatFirstAndLastDigits)
+		.map((number) => parseInt(number));
+	return values.reduce((a, b) => a + b, 0);
 }
 
 export async function extractCoordinates(filename) {
 	const lines = await extractAndTrimLines(filename);
-	const values = lines.map(addFirstAndLastLineDigits);
-	return values.reduce((a, b) => a + b, 0);
+	return sumUpLines(lines);
 }
