@@ -3,7 +3,6 @@ import {
 	concatFirstAndLastDigits,
 	extractCoordinates,
 	sumUpLines,
-	debug,
 } from './day1-2';
 
 describe('day 1 problem 1', () => {
