@@ -42,16 +42,32 @@ export function countSteps(iterator, graph, from, to) {
 	let steps = 0;
 	let current = from;
 	while (current !== to) {
-		const next =
-			iterator.next().value === 'R' ? graph[current][1] : graph[current][0];
+		const direction = iterator.next().value;
+		current = graph[current][direction === 'R' ? 1 : 0];
 		steps++;
-		current = next;
 	}
 	return steps;
 }
 
-console.log('day 8');
-const lines = await extractAndTrimLines('src/day8.input.txt');
-const iterator = stepIterator(lines[0]);
-const graph = readGraphLines(lines.slice(1));
-console.log(countSteps(iterator, graph, 'AAA', 'ZZZ'));
+export function countMultiSteps(iterator, graph, startingPoints) {
+	let steps = 0;
+	let current = startingPoints;
+	while (current.some((point) => point.substring(2) !== 'Z')) {
+		const direction = iterator.next().value;
+		current = current.map((point) => {
+			const next = graph[point][direction === 'R' ? 1 : 0];
+			return next;
+		});
+		steps++;
+	}
+	return steps;
+}
+//
+// const lines = await extractAndTrimLines('src/day8.input.txt');
+// const iterator = stepIterator(lines[0]);
+// const graph = readGraphLines(lines.slice(1));
+// const startingPoints = Object.keys(graph).filter(
+// 	(key) => key.substring(2) === 'A',
+// );
+// console.log(startingPoints);
+// // countMultiSteps(iterator, graph, startingPoints);
